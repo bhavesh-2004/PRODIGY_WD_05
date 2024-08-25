@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(to right, #00f, #f00); /* Blue to Red gradient */
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(216, 206, 91, 0.993);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #weatherOutput {
+            margin-top: 20px;
+        }
+
+        .weather-icon, .temperature-icon, .humidity-icon {
+            width: 50px;
+            height: 50px;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Weather App</h1>
+        <input type="text" id="locationInput" placeholder="Enter location" />
+        <button id="getWeatherButton">Get Weather</button>
+        <p>Get the weather details of any city, right now</p>
+        <div id="weatherOutput">
+            <div id="weatherCondition">
+                <img src="weather-icon.png" alt="Weather Icon" class="weather-icon" />
+                <p id="weatherDescription"></p>
+            </div>
+            <div id="weatherTemperature">
+                <img src="temperature-icon.webp" alt="Temperature Icon" class="temperature-icon" />
+                <p id="weatherTemperature"></p>
+            </div>
+            <div id="weatherHumidity">
+                <img src="humidity.png" alt="Humidity Icon" class="humidity-icon" />
+                <p id="weatherHumidity"></p>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('getWeatherButton').addEventListener('click', function() {
+            const location = document.getElementById('locationInput').value;
+            if (location) {
+                getWeather(location);
+            } else {
+                alert('Please enter a location');
+            }
+        });
+
+        function getWeather(location) {
+            const apiKey = '91ef78e4f4a6e6ffe597003703154ddc'; // Ensure this is a valid API key
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.cod === 200) {
+                        // Update weather section
+                        document.getElementById('weatherDescription').textContent = `Weather: ${data.weather[0].description}`;
+
+                        // Update temperature section
+                        document.getElementById('weatherTemperature').textContent = `Temperature: ${data.main.temp} °C`;
+
+                        // Update humidity section
+                        document.getElementById('weatherHumidity').textContent = `Humidity: ${data.main.humidity}%`;
+
+                        // Update weather icon
+                        const weatherIcon = `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
+                        document.querySelector('#weatherCondition img').src = weatherIcon;
+                    } else {
+                        alert('Location not found');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching weather data:', error);
+                    alert('Error fetching weather data');
+                });
+        }
+    </script>
+</body>
+</html>
